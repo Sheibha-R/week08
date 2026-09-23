@@ -65,13 +65,15 @@ jobs:
         run: |
           kubectl apply \
             -f kubernetes/production/
+    
 
       - name: Update frontend image
         run: |
           kubectl set image deployment/frontend \
-            frontend=${{ vars.ACR_LOGIN_SERVER }}/koalatech-frontend:${{ inputs.image_tag }} \
+            frontend=${{ vars.ACR_LOGIN_SERVER }}/koalatech-frontend:latest \
             -n production
-
+      
+      
       - name: Update user-service image
         run: |
           kubectl set image deployment/user-service \
