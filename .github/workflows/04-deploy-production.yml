@@ -70,8 +70,8 @@ jobs:
       - name: Update frontend image
         run: |
           kubectl set image deployment/frontend \
-            frontend=${{ vars.ACR_LOGIN_SERVER }}/koalatech-frontend:latest \
-            -n production
+          frontend=sheibhaweek07acr.azurecr.io/koalatech-frontend:latest \
+          -n production
       
       
       - name: Update user-service image
