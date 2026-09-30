@@ -312,4 +312,4 @@ After the production deployment completes:
 - Confirm that the application is working correctly.
 - Verify that production is running the same image SHA that was tested in staging.
 
-# Week08 CI workflow demonstration
+# Week08 CI workflow demonstration# CI demonstration for Task 8.1P
