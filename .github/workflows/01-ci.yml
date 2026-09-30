@@ -149,6 +149,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Set Azure subscription
+        run: |
+          az account set --subscription "ae9dcd4e-efc9-402a-aabf-cf027f7c51cb"
+          az account show --query "{Name:name,SubscriptionId:id}" -o table
+
       - name: Login to Azure Container Registry
         run: |
           az acr login --name ${{ vars.ACR_NAME }}
