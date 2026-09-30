@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: course-service
-          image: placeholder
+          image: koalatechacrweek08sr.azurecr.io/course-service:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

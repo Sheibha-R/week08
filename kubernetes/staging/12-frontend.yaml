@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: placeholder
+          image: koalatechacrweek08sr.azurecr.io/frontend:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80

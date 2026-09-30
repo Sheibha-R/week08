@@ -28,7 +28,7 @@ spec:
 
       containers:
         - name: frontend
-          image: sheibhaweek07acr.azurecr.io/koalatech-frontend:latest
+          image: koalatechacrweek08sr.azurecr.io/frontend:v1
           imagePullPolicy: Always
 
           ports:
