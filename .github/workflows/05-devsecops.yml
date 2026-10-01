@@ -1,0 +1,81 @@
+name: 05 - DevSecOps Validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/05-devsecops.yml'
+
+jobs:
+  terraform:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+  security:
+    name: Docker Scout Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        run: az acr login --name koalatechacrweek08sr
+
+      - name: Docker Scout CVE scan
+        uses: docker/scout-action@v1
+        with:
+          command: cves,recommendations
+          image: koalatechacrweek08sr.azurecr.io/week08-frontend:10.1p
+          only-severities: critical,high
+          exit-code: false
+
+  monitoring:
+    name: Validate Monitoring
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group rg_koalatech-week08 \
+            --name koalatech-week08-aks \
+            --overwrite-existing
+
+      - name: Verify Prometheus and Grafana
+        run: |
+          kubectl get pods -n monitoring
+          kubectl get svc -n monitoring
+          kubectl get deployment -n monitoring monitoring-grafana

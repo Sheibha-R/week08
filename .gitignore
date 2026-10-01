@@ -197,3 +197,22 @@ cython_debug/
 .cursorindexingignore
 
 node_modules/
+cat >> .gitignore <<'EOF'
+
+# Terraform local/generated files
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+*.tfvars
+crash.log
+
+# Terraform local/generated files
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+*.tfvars
+crash.log
