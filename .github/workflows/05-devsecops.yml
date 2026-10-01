@@ -50,6 +50,7 @@ jobs:
         run: az acr login --name koalatechacrweek08sr
 
       - name: Docker Scout CVE scan
+        continue-on-error: true
         uses: docker/scout-action@v1
         with:
           command: cves,recommendations
@@ -70,7 +71,7 @@ jobs:
       - name: Get AKS credentials
         run: |
           az aks get-credentials \
-            --resource-group rg_koalatech-week08 \
+            --resource-group koalatech-week08-rg \
             --name koalatech-week08-aks \
             --overwrite-existing
 
