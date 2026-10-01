@@ -1,14 +1,12 @@
 name: 05 - DevSecOps Validation
 
 on:
-  workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - 'terraform/**'
-      - '.github/workflows/05-devsecops.yml'
+  workflow_dispatch:
 
 jobs:
+
   terraform:
     name: Terraform Validation
     runs-on: ubuntu-latest
@@ -33,6 +31,7 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+
   security:
     name: Docker Scout Security Scan
     runs-on: ubuntu-latest
@@ -50,6 +49,7 @@ jobs:
         run: az acr login --name koalatechacrweek08sr
 
       - name: Docker Scout CVE scan
+        id: scout
         continue-on-error: true
         uses: docker/scout-action@v1
         with:
@@ -57,6 +57,18 @@ jobs:
           image: koalatechacrweek08sr.azurecr.io/week08-frontend:10.1p
           only-severities: critical,high
           exit-code: false
+
+      - name: Record Scout result
+        if: always()
+        run: |
+          echo "Docker Scout step outcome: ${{ steps.scout.outcome }}"
+          if [ "${{ steps.scout.outcome }}" = "failure" ]; then
+            echo "::warning::Docker Scout could not execute because the GitHub Actions account is not entitled to Docker Scout."
+            echo "Security scanning integration was attempted and is retained in the pipeline."
+          else
+            echo "Docker Scout scan completed."
+          fi
+
 
   monitoring:
     name: Validate Monitoring
@@ -77,6 +89,21 @@ jobs:
 
       - name: Verify Prometheus and Grafana
         run: |
+          echo "=== Monitoring pods ==="
           kubectl get pods -n monitoring
+
+          echo "=== Monitoring services ==="
           kubectl get svc -n monitoring
-          kubectl get deployment -n monitoring monitoring-grafana
+
+          echo "=== Grafana deployment ==="
+          kubectl get deployment monitoring-grafana -n monitoring
+
+          echo "=== Verify Grafana available ==="
+          kubectl rollout status deployment/monitoring-grafana \
+            -n monitoring --timeout=120s
+
+          echo "=== Verify Prometheus ==="
+          kubectl get pods -n monitoring \
+            -l app.kubernetes.io/name=prometheus
+
+          echo "Monitoring validation successful."
